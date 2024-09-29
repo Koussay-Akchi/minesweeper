@@ -6,14 +6,13 @@ interface CellProps {
   onClick: () => void;
 }
 
-const getCellContentAndStyle = (neighboringMines: number) => {
-  if (neighboringMines === 0) {
-    return { content: "", style: "text-transparent" };
-  }
-  const content = neighboringMines.toString();
+const getCellStyle = (neighboringMines: number) => {
   let textColor = "";
 
   switch (neighboringMines) {
+    case 0:
+      textColor = "text-[#7F7F7F]";
+      break;
     case 1:
       textColor = "text-[#0000FE]";
       break;
@@ -25,7 +24,7 @@ const getCellContentAndStyle = (neighboringMines: number) => {
       break;
   }
 
-  return { content, style: textColor };
+  return textColor;
 };
 
 const Cell: React.FC<CellProps> = ({ cell, onClick }) => {
@@ -35,20 +34,20 @@ const Cell: React.FC<CellProps> = ({ cell, onClick }) => {
     }
   };
 
-  const { content, style } = getCellContentAndStyle(cell.neighboringMines);
+  const style = getCellStyle(cell.neighboringMines);
 
   return (
     <button
       onClick={handleClick}
-      className={`flex items-center justify-center w-10 h-10 border border-gray-400 transition-colors duration-150 bg-[#BFBFBF] rounded-none 
-                  ${
-                    cell.isRevealed
-                      ? "bg-gray-300"
-                      : "bg-[#BFBFBF] hover:bg-gray-400"
-                  }`}
+      className={`flex items-center justify-center w-10 h-10 border border-gray-400 transition-colors duration-150 bg-[#BFBFBF]
+        ${
+          !cell.isRevealed
+            ? "shadow-[inset_-5px_-3px_3px_0px_rgba(255,255,255,0.8),inset_3px_3px_3px_0px_rgba(0,0,0,0.2)]"
+            : "bg-gray-300 cursor-default"
+        }`}
     >
-      <span className={style} style={{ fontSize: "18px" }}>
-        {cell.isRevealed ? (cell.isMine ? "💣" : content) : ""}
+      <span className={style} style={{ fontSize: "20px" }}>
+        {cell.isRevealed ? (cell.isMine ? "💣" : cell.neighboringMines) : ""}
       </span>
     </button>
   );
