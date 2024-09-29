@@ -15,7 +15,6 @@ const createBoard = (): Board => {
     }))
   );
 
-  // Place mines
   let minesPlaced = 0;
   while (minesPlaced < MINES) {
     const row = Math.floor(Math.random() * ROWS);
@@ -25,8 +24,6 @@ const createBoard = (): Board => {
       minesPlaced++;
     }
   }
-
-  // Calculate neighboring mines
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
       if (board[r][c].isMine) {
@@ -50,8 +47,17 @@ const Game: React.FC = () => {
   const [board, setBoard] = useState<Board>(createBoard());
 
   const handleCellClick = (row: number, col: number) => {
-    // Implement logic to reveal cell
     const newBoard = [...board];
+
+    if (newBoard[row][col].isMine) {
+      const explosionSound = new Audio('/explosion.mp3');
+      explosionSound.play();
+      //TODO reset
+    }
+
+    const clickSound = new Audio('/click.wav');
+    clickSound.play();
+
     newBoard[row][col].isRevealed = true;
     setBoard(newBoard);
   };
