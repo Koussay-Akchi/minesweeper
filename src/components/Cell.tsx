@@ -5,7 +5,6 @@ interface CellProps {
   cell: CellType;
   onClick: () => void;
 }
-
 const getCellStyle = (neighboringMines: number) => {
   let textColor = "";
 
@@ -27,7 +26,7 @@ const getCellStyle = (neighboringMines: number) => {
   return textColor;
 };
 
-const Cell: React.FC<CellProps> = ({ cell, onClick }) => {
+const Cell: React.FC<CellProps> = React.memo(({ cell, onClick }) => {
   const handleClick = () => {
     if (!cell.isRevealed) {
       onClick();
@@ -51,6 +50,6 @@ const Cell: React.FC<CellProps> = ({ cell, onClick }) => {
       </span>
     </button>
   );
-};
+});
 
 export default Cell;
