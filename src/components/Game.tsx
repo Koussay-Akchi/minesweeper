@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Board } from "../types";
 import Cell from "./Cell";
 
@@ -45,17 +45,31 @@ const createBoard = (): Board => {
 
 const Game: React.FC = () => {
   const [board, setBoard] = useState<Board>(createBoard());
+  const [lost, setLost] = useState(false);
+
+  useEffect(() => {
+    const initialBoard = createBoard();
+    setBoard(initialBoard);
+  }, []);
+
+  const resetGame = () => {
+    const newBoard = createBoard();
+    setBoard(newBoard);
+    setLost(false);
+  };
 
   const handleCellClick = (row: number, col: number) => {
+    if (lost || board[row][col].isRevealed) return;
+
     const newBoard = [...board];
 
     if (newBoard[row][col].isMine) {
-      const explosionSound = new Audio('/explosion.mp3');
+      const explosionSound = new Audio("/explosion.mp3");
       explosionSound.play();
-      //TODO reset
+      setLost(true);
     }
 
-    const clickSound = new Audio('/click.wav');
+    const clickSound = new Audio("/click.wav");
     clickSound.play();
 
     newBoard[row][col].isRevealed = true;
@@ -63,18 +77,29 @@ const Game: React.FC = () => {
   };
 
   return (
-    <div>
-      {board.map((row, rowIndex) => (
-        <div key={rowIndex} style={{ display: "flex" }}>
-          {row.map((cell, colIndex) => (
-            <Cell
-              key={colIndex}
-              cell={cell}
-              onClick={() => handleCellClick(rowIndex, colIndex)}
-            />
-          ))}
-        </div>
-      ))}
+    <div className="flex flex-col items-center justify-center h-screen">
+      {lost && (
+        <button
+          onClick={resetGame}
+          className="mb-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+        >
+          Retry
+        </button>
+      )}
+
+      <div>
+        {board.map((row, rowIndex) => (
+          <div key={rowIndex} style={{ display: "flex" }}>
+            {row.map((cell, colIndex) => (
+              <Cell
+                key={colIndex}
+                cell={cell}
+                onClick={() => handleCellClick(rowIndex, colIndex)}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
