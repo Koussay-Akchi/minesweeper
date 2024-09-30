@@ -67,9 +67,10 @@ const Game: React.FC = () => {
   const [wins, setWins] = useState<number>(0);
   const [losses, setLosses] = useState<number>(0);
   const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">(
-    "easy"
+    "medium"
   );
-  const [size, setSize] = useState<"small" | "medium" | "big">("small");
+  const [bombsDisplay, setBombsDisplay] = useState<string>("💣💣");
+  const [size, setSize] = useState<"small" | "medium" | "big">("medium");
 
   useEffect(() => {
     const storedWins = localStorage.getItem("wins");
@@ -146,12 +147,15 @@ const Game: React.FC = () => {
     switch (difficulty) {
       case "easy":
         percentage = 0.1;
+        setBombsDisplay("💣");
         break;
       case "medium":
         percentage = 0.2;
+        setBombsDisplay("💣💣");
         break;
       case "hard":
         percentage = 0.4;
+        setBombsDisplay("💣💣💣");
         break;
     }
     const settingsSound = new Audio("/settings.wav");
@@ -171,7 +175,7 @@ const Game: React.FC = () => {
         length = 10;
         break;
       case "big":
-        length = 20;
+        length = 14;
         break;
     }
     const settingsSound = new Audio("/settings.wav");
@@ -183,89 +187,103 @@ const Game: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <div className="mb-6 flex space-x-4">
-        <div className="px-4 py-2 bg-green-500 border border-green-400 text-green-800 rounded-lg shadow-md">
-          <span className="font-semibold">Wins :</span>
-          <div className="flex justify-center">{wins}</div>
-        </div>
-        <div className="px-4 py-2 bg-red-400 border border-red-400 text-red-800 rounded-lg shadow-md">
-          <span className="font-semibold">Losses :</span>
-          <div className="flex justify-center">{losses}</div>
-        </div>
-      </div>
-
-      <div className="mb-4 flex space-x-4 items-center justify-center">
-        <div>
-          <h3 className="text-lg mb-2">
-            Difficulty: <span className="text-sm">({difficulty})</span>
-          </h3>
-          <button
-            onClick={() => handleDifficultyChange("easy")}
-            className="mr-2 px-4 py-2 bg-blue-200 rounded"
-          >
-            Easy
-          </button>
-          <button
-            onClick={() => handleDifficultyChange("medium")}
-            className="mr-2 px-4 py-2 bg-blue-300 rounded"
-          >
-            Medium
-          </button>
-          <button
-            onClick={() => handleDifficultyChange("hard")}
-            className="px-4 py-2 bg-blue-400 rounded"
-          >
-            Hard
-          </button>
-        </div>
-        <div>
-          <h3 className="text-lg mb-2">
-            Size:<span className="text-sm">({size})</span>
-          </h3>
-          <button
-            onClick={() => handleSizeChange("small")}
-            className="mr-2 px-4 py-2 bg-green-200 rounded"
-          >
-            Small
-          </button>
-          <button
-            onClick={() => handleSizeChange("medium")}
-            className="mr-2 px-4 py-2 bg-green-300 rounded"
-          >
-            Medium
-          </button>
-          <button
-            onClick={() => handleSizeChange("big")}
-            className="px-4 py-2 bg-green-400 rounded"
-          >
-            Big
-          </button>
-        </div>
-      </div>
-      <div className="mb-4 h-12 flex items-center justify-center">
-        {lost && (
-          <button
-            onClick={resetGame}
-            className="mb-4 px-4 py-2 bg-gold text-white rounded hover:bg-yellow-600"
-          >
-            Play Again
-          </button>
-        )}
-      </div>
-
-      <div>
-        {board.map((row, rowIndex) => (
-          <div key={rowIndex} style={{ display: "flex" }}>
-            {row.map((cell, colIndex) => (
-              <Cell
-                key={colIndex}
-                cell={cell}
-                onClick={() => handleCellClick(rowIndex, colIndex)}
-              />
-            ))}
+    <div className="flex flex-col-2 items-center justify-center h-screen gap-3">
+      <div className="">
+        <h1 className="text-4xl font-bold mb-4">Minesweeper</h1>
+        <div className="mb-6 flex space-x-4 justify-center">
+          <div className="px-4 py-2 bg-green-500 border border-green-400 text-green-800 rounded-lg shadow-md">
+            <span className="font-semibold">Wins :</span>
+            <div className="flex justify-center">{wins}</div>
           </div>
-        ))}
+          <div className="px-4 py-2 bg-red-400 border border-red-400 text-red-800 rounded-lg shadow-md">
+            <span className="font-semibold">Losses :</span>
+            <div className="flex justify-center">{losses}</div>
+          </div>
+        </div>
+
+        <div className="mb-4 items-center justify-center">
+          <div>
+            <h3 className="text-lg mb-2 flex justify-center items-center">
+              Difficulty :&nbsp;
+              <span className="text-sm">
+                (
+                {difficulty.charAt(0).toUpperCase() +
+                  difficulty.slice(1) +
+                  bombsDisplay}
+                )
+              </span>
+            </h3>
+            <button
+              onClick={() => handleDifficultyChange("easy")}
+              className="mr-2 px-4 py-2 bg-blue-200 rounded"
+            >
+              Easy
+            </button>
+            <button
+              onClick={() => handleDifficultyChange("medium")}
+              className="mr-2 px-4 py-2 bg-blue-300 rounded"
+            >
+              Medium
+            </button>
+            <button
+              onClick={() => handleDifficultyChange("hard")}
+              className="px-4 py-2 bg-blue-400 rounded"
+            >
+              Hard
+            </button>
+          </div>
+          <div className="mt-4">
+            <h3 className="text-lg mb-2 flex justify-center items-center">
+              Size :&nbsp;
+              <span className="text-sm">
+                ({size.charAt(0).toUpperCase() + size.slice(1)})
+              </span>
+            </h3>
+            <button
+              onClick={() => handleSizeChange("small")}
+              className="mr-2 px-4 py-2 bg-green-200 rounded"
+            >
+              Small
+            </button>
+            <button
+              onClick={() => handleSizeChange("medium")}
+              className="mr-2 px-4 py-2 bg-green-300 rounded"
+            >
+              Medium
+            </button>
+            <button
+              onClick={() => handleSizeChange("big")}
+              className="px-4 py-2 bg-green-400 rounded"
+            >
+              Big
+            </button>
+          </div>
+        </div>
+        <div className="mb-4 h-12 flex items-center justify-center">
+          {lost && (
+            <button
+              onClick={resetGame}
+              className="mb-4 px-4 py-2 bg-gold text-white rounded hover:bg-yellow-600"
+            >
+              Play Again
+            </button>
+          )}
+        </div>
+      </div>
+      <div className="flex flex-col-2">
+        <div>
+          {board.map((row, rowIndex) => (
+            <div key={rowIndex} style={{ display: "flex" }}>
+              {row.map((cell, colIndex) => (
+                <Cell
+                  key={colIndex}
+                  cell={cell}
+                  onClick={() => handleCellClick(rowIndex, colIndex)}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
