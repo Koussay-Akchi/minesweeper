@@ -1,6 +1,7 @@
 export type Cell = {
     isMine: boolean;
     isRevealed: boolean;
+    isFlagged: boolean;
     neighboringMines: number;
   };
   

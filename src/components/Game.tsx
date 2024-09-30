@@ -15,6 +15,7 @@ const createBoard = (
     Array.from({ length: cols }, () => ({
       isMine: false,
       isRevealed: false,
+      isFlagged: false,
       neighboringMines: 0,
     }))
   );
@@ -89,6 +90,8 @@ const Game: React.FC = () => {
     setBoard(newBoard);
     setLost(false);
     setRemainingCells(rows * cols - Math.floor(rows * cols * minesPercentage));
+    const settingsSound = new Audio("/settings.wav");
+    settingsSound.play();
   };
 
   const resetGame2 = (rows: number, cols: number, minesPercentage: number) => {
@@ -110,6 +113,7 @@ const Game: React.FC = () => {
 
   const handleLoss = () => {
     const explosionSound = new Audio("/explosion.mp3");
+    explosionSound.volume = 0.5;
     explosionSound.play();
     setLost(true);
     setLosses((prevLosses) => {
@@ -119,27 +123,69 @@ const Game: React.FC = () => {
     });
   };
 
-  const handleCellClick = (row: number, col: number) => {
+  const revealCell = (board: Board, row: number, col: number): Board => {
+    if (
+      row < 0 ||
+      row >= board.length ||
+      col < 0 ||
+      col >= board[0].length ||
+      board[row][col].isRevealed
+    ) {
+      return board;
+    }
+
+    const newBoard = [...board];
+    newBoard[row][col].isRevealed = true;
+
+    if (newBoard[row][col].neighboringMines === 0) {
+      for (let i = -1; i <= 1; i++) {
+        for (let j = -1; j <= 1; j++) {
+          if (i !== 0 || j !== 0) {
+            revealCell(newBoard, row + i, col + j);
+          }
+        }
+      }
+    }
+
+    return newBoard;
+  };
+
+  const handleCellRightClick = (row: number, col: number) => {
     if (lost || board[row][col].isRevealed) return;
 
     const newBoard = [...board];
+    newBoard[row][col].isFlagged = !newBoard[row][col].isFlagged;
+    setBoard(newBoard);
+
+    const settingsSound = new Audio("/settings.wav");
+    settingsSound.play();
+  };
+
+  const handleCellClick = (row: number, col: number) => {
+    if (lost || board[row][col].isRevealed || board[row][col].isFlagged) return;
+
+    let newBoard = [...board];
 
     if (newBoard[row][col].isMine) {
       handleLoss();
+      newBoard[row][col].isRevealed = true;
     } else {
       const clickSound = new Audio("/click.wav");
       clickSound.play();
+      newBoard = revealCell(newBoard, row, col);
     }
 
-    newBoard[row][col].isRevealed = true;
     setBoard(newBoard);
-    setRemainingCells((prev) => {
-      const newRemaining = prev - 1;
-      if (newRemaining === 0) {
-        handleWin();
-      }
-      return newRemaining;
-    });
+    const revealedCount = newBoard
+      .flat()
+      .filter((cell) => cell.isRevealed).length;
+    const totalNonMineCells =
+      rows * cols - Math.floor(rows * cols * minesPercentage);
+    setRemainingCells(totalNonMineCells - revealedCount);
+
+    if (revealedCount === totalNonMineCells) {
+      handleWin();
+    }
   };
 
   const handleDifficultyChange = (difficulty: "easy" | "medium" | "hard") => {
@@ -279,6 +325,7 @@ const Game: React.FC = () => {
                   key={colIndex}
                   cell={cell}
                   onClick={() => handleCellClick(rowIndex, colIndex)}
+                  onRightClick={() => handleCellRightClick(rowIndex, colIndex)}
                 />
               ))}
             </div>
