@@ -166,6 +166,15 @@ const Game: React.FC = () => {
 
     let newBoard = [...board];
 
+    if (newBoard.flat().every((cell) => !cell.isRevealed)) {
+      while (true) {
+        newBoard = createBoard(rows, cols, minesPercentage);
+        if (newBoard[row][col].neighboringMines === 0) {
+          break;
+        }
+      }
+    }
+
     if (newBoard[row][col].isMine) {
       handleLoss();
       newBoard[row][col].isRevealed = true;
