@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Board } from "../types";
 import Cell from "./Cell";
+import HowToPlayModal from "./HowToPlayModal";
 
 const DEFAULT_ROWS = 10;
 const DEFAULT_COLS = 10;
@@ -72,6 +73,7 @@ const Game: React.FC = () => {
   );
   const [bombsDisplay, setBombsDisplay] = useState<string>("💣💣");
   const [size, setSize] = useState<"small" | "medium" | "big">("medium");
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 
   useEffect(() => {
     const storedWins = localStorage.getItem("wins");
@@ -243,7 +245,13 @@ const Game: React.FC = () => {
 
   return (
     <div className="flex flex-col-2 items-center justify-center h-screen gap-3">
-      <div className="">
+      <div>
+        <div
+          className="underline cursor-pointer text-xs font-semibold flex justify-center"
+          onClick={() => setIsHelpModalOpen(true)}
+        >
+          How to Play ?
+        </div>
         <h1 className="text-4xl font-bold mb-4">Minesweeper</h1>
         <div className="mb-6 flex space-x-4 justify-center">
           <div className="px-4 py-2 bg-green-500 border border-green-400 text-green-800 rounded-lg shadow-md">
@@ -341,6 +349,10 @@ const Game: React.FC = () => {
           ))}
         </div>
       </div>
+      <HowToPlayModal
+        isOpen={isHelpModalOpen}
+        onClose={() => setIsHelpModalOpen(false)}
+      />
     </div>
   );
 };
