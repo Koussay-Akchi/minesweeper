@@ -3,7 +3,7 @@
 A basic Minesweeper game built with React. 
 
 I made this out of curiosity/boredom, it came out decent enough somehow 🤷
-## 👉 [Live website](https://basic-minesweeper.web.app/)
+## 👉 [Live website](https://minesweeper.koussay.tn)
 <div style="display: flex; gap: 20px;">
     <img src="/minesweeper.png" alt="screenshot" height="300">
 </div>
